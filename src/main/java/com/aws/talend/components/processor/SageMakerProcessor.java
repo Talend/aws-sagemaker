@@ -90,15 +90,50 @@ public class SageMakerProcessor implements Serializable {
         {
             try {
                 List<String> responses = this.service.processRecords(this.awsSageMaker, this.records);
+                int idx = 0;
                 for (String response : responses) {
+
                     Record.Builder record = builderFactory.newRecordBuilder();
-                    record.withString("Response", response);
+                    Record rec = this.records.get(idx++);
+
+                        List<Schema.Entry> entries = rec.getSchema().getEntries();
+                        for (Schema.Entry entry : entries) {
+                            String name = entry.getName();
+                            Schema.Type type = entry.getType();
+                            switch (type) {
+                                case DATETIME:
+                                    record.withDateTime(name, rec.getDateTime(name));
+                                    break;
+                                case BOOLEAN:
+                                    record.withBoolean(name, rec.getBoolean(name));
+                                    break;
+                                case DOUBLE:
+                                    record.withDouble(name, rec.getDouble(name));
+                                    break;
+                                case INT:
+                                    record.withInt(name, rec.getInt(name));
+                                    break;
+                                case LONG:
+                                    record.withLong(name, rec.getLong(name));
+                                    break;
+                                case FLOAT:
+                                    record.withFloat(name, rec.getFloat(name));
+                                    break;
+                                case STRING:
+                                    record.withString(name, rec.getString(name));
+                                    break;
+                                case BYTES:
+                                    record.withBytes(name, rec.getBytes(name));
+                                    break;
+                            }
+                        }
+                    record.withString("SageMakerResponse", response);
                     outputEmitter.emit(record.build());
                 }
 
             } catch(AwsSageMakerInvokeException e) {
                 Record.Builder reject = builderFactory.newRecordBuilder();
-                reject.withString("Response", e.getMessage());
+                reject.withString("SageMakerResponse", e.getMessage());
                 rejectEmitter.emit(reject.build());
             }
             this.records.clear();
