@@ -58,7 +58,7 @@ public class SageMakerProcessor implements Serializable {
         awsSageMaker = AwsSageMakerImpl.getInstance(this.configuration.getAwsAccessKey(),
                 this.configuration.getAwsSecretKey(), this.configuration.getAwsRegion(),
                 this.configuration.getContentType(), this.configuration.getAccept(),
-                this.configuration.getEndpointName());
+                this.configuration.getEndpointName(), this.configuration.getAwsSessionToken());
     }
 
     @BeforeGroup

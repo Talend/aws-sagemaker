@@ -15,6 +15,7 @@ import org.talend.sdk.component.api.meta.Documentation;
     // customize it as much as needed
         @GridLayout.Row({ "awsAccessKey" }),
         @GridLayout.Row({ "awsSecretKey" }),
+        @GridLayout.Row({"awsSessionToken"}),
         @GridLayout.Row({ "awsRegion" }),
         @GridLayout.Row({ "contentType" }),
         @GridLayout.Row({ "accept" }),
@@ -33,6 +34,11 @@ public class SageMakerProcessorConfiguration implements Serializable {
     @Credential
     @Documentation("AWS Secret Key")
     private String awsSecretKey;
+
+    @Option
+    @Credential
+    @Documentation("AWS Session Token")
+    private String awsSessionToken;
 
     @Option
     @Proposable("listAwsRegions")
@@ -72,6 +78,14 @@ public class SageMakerProcessorConfiguration implements Serializable {
 
     public SageMakerProcessorConfiguration setAwsSecretKey(String awsSecretKey) {
         this.awsSecretKey = awsSecretKey;
+        return this;
+    }
+
+    public String getAwsSessionToken() {return this.awsSessionToken; }
+
+    public SageMakerProcessorConfiguration setAwsSessionToken(String sessionToken)
+    {
+        this.awsSessionToken = sessionToken;
         return this;
     }
 

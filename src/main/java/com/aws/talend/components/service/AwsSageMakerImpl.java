@@ -3,6 +3,7 @@ package com.aws.talend.components.service;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.BasicSessionCredentials;
 import com.amazonaws.services.sagemakerruntime.AmazonSageMakerRuntime;
 import com.amazonaws.services.sagemakerruntime.AmazonSageMakerRuntimeClientBuilder;
 import com.amazonaws.services.sagemakerruntime.model.InvokeEndpointRequest;
@@ -21,9 +22,10 @@ public class AwsSageMakerImpl {
     private String contentType;
     private String accept;
     private String endpointName;
+    private String sessionToken;
 
     private AwsSageMakerImpl(String awsAccessKey, String awsSecretKey, String awsRegion, String contentType,
-                             String accept, String endpointName)
+                             String accept, String endpointName, String sessionToken)
     {
         this.awsAccessKey = awsAccessKey;
         this.awsSecretKey = awsSecretKey;
@@ -31,20 +33,21 @@ public class AwsSageMakerImpl {
         this.contentType = contentType;
         this.accept = accept;
         this.endpointName = endpointName;
+        this.sessionToken = sessionToken;
         init();
     }
 
     public static AwsSageMakerImpl getInstance(String awsAccessKey, String awsSecretKey, String awsRegion, String contentType,
-                                               String accept, String endpointName) {
+                                               String accept, String endpointName, String sessionToken) {
         if (instance == null)
-            instance = new AwsSageMakerImpl(awsAccessKey, awsSecretKey, awsRegion, contentType, accept, endpointName);
+            instance = new AwsSageMakerImpl(awsAccessKey, awsSecretKey, awsRegion, contentType, accept, endpointName, sessionToken);
 
         return instance;
     }
 
 
     private void init(){
-        AWSCredentials credentials = new BasicAWSCredentials(this.awsAccessKey, this.awsSecretKey);
+        AWSCredentials credentials = new BasicSessionCredentials(this.awsAccessKey, this.awsSecretKey, this.sessionToken);
 
         client = AmazonSageMakerRuntimeClientBuilder
                 .standard()
