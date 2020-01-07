@@ -38,7 +38,7 @@
     <dependency>
       <groupId>org.talend.sdk.component</groupId>
       <artifactId>component-api</artifactId>
-      <version>1.1.14</version>
+      <version>1.1.15</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -55,7 +55,7 @@
     <dependency>
       <groupId>org.talend.sdk.component</groupId>
       <artifactId>component-runtime-junit</artifactId>
-      <version>1.1.14</version>
+      <version>1.1.15</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -65,7 +65,7 @@
       <extension>
         <groupId>org.talend.sdk.component</groupId>
         <artifactId>talend-component-maven-plugin</artifactId>
-        <version>1.1.14</version>
+        <version>1.1.15</version>
       </extension>
     </extensions>
 
