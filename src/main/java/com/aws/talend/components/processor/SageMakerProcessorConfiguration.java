@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.action.Proposable;
+import org.talend.sdk.component.api.configuration.condition.ActiveIf;
 import org.talend.sdk.component.api.configuration.constraint.Pattern;
 import org.talend.sdk.component.api.configuration.ui.DefaultValue;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
@@ -15,6 +16,7 @@ import org.talend.sdk.component.api.meta.Documentation;
     // customize it as much as needed
         @GridLayout.Row({ "awsAccessKey" }),
         @GridLayout.Row({ "awsSecretKey" }),
+        @GridLayout.Row({"hasAwsSessionToken"}),
         @GridLayout.Row({"awsSessionToken"}),
         @GridLayout.Row({ "awsRegion" }),
         @GridLayout.Row({ "contentType" }),
@@ -36,7 +38,12 @@ public class SageMakerProcessorConfiguration implements Serializable {
     private String awsSecretKey;
 
     @Option
+    @Documentation("If AWS Session Token Required")
+    private boolean hasAwsSessionToken = false;
+
+    @Option
     @Credential
+    @ActiveIf(target = "hasAwsSessionToken", value = { "true" })
     @Documentation("AWS Session Token")
     private String awsSessionToken;
 
@@ -78,6 +85,14 @@ public class SageMakerProcessorConfiguration implements Serializable {
 
     public SageMakerProcessorConfiguration setAwsSecretKey(String awsSecretKey) {
         this.awsSecretKey = awsSecretKey;
+        return this;
+    }
+
+    public boolean isHasAwsSessionToken() {return this.hasAwsSessionToken; }
+
+    public SageMakerProcessorConfiguration setHasAwsSessionToken(boolean hasAwsSessionToken)
+    {
+        this.hasAwsSessionToken = hasAwsSessionToken;
         return this;
     }
 
