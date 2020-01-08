@@ -1,7 +1,6 @@
 package com.aws.talend.components.service;
 
 import com.amazonaws.regions.Regions;
-import com.sun.org.apache.xpath.internal.operations.String;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.record.Record;
 import org.talend.sdk.component.api.record.Schema;
@@ -87,10 +86,16 @@ public class AwsSagemakerService {
                 }
             }
         }
-        java.lang.String resp = awsSageMaker.invokeEndpoint(payload.toString());
-        for (java.lang.String rec : resp.split(","))
+        String resp = awsSageMaker.invokeEndpoint(payload.toString());
+        String delimiter = ",";
+        if (resp.startsWith("["))
+            delimiter = "],";
+        for (String rec : resp.split(delimiter))
         {
-            response.add(rec);
+            if (!delimiter.equals(","))
+                response.add(rec.replace("[",""));
+            else
+                response.add(rec);
         }
         return response;
     }
