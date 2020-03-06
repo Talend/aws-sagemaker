@@ -41,6 +41,7 @@ public class SageMakerProcessor implements Serializable {
     private OutputEmitter<Record> outputEmitter = null;
     private OutputEmitter<Record> rejectEmitter = null;
     private RecordBuilderFactory builderFactory = null;
+    private boolean doGuessSchema = false;
 
     public SageMakerProcessor(@Option("configuration") final SageMakerProcessorConfiguration configuration,
                           final AwsSagemakerService service, final RecordBuilderFactory builderFactory) {
@@ -60,6 +61,12 @@ public class SageMakerProcessor implements Serializable {
                 this.configuration.getContentType(), this.configuration.getAccept(),
                 this.configuration.getEndpointName(), this.configuration.getAwsSessionToken(),
                 this.configuration.isHasAwsSessionToken());
+
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        if (stackTraceElements[stackTraceElements.length - 1].getClassName().contains("guess_schema"))
+        {
+            this.doGuessSchema = true;
+        }
     }
 
     @BeforeGroup
@@ -81,6 +88,49 @@ public class SageMakerProcessor implements Serializable {
         this.records.add(defaultInput);
         this.outputEmitter = defaultOutput;
         this.rejectEmitter = REJECTOutput;
+
+        if (doGuessSchema) {
+            Record.Builder record = builderFactory.newRecordBuilder();
+            List<Schema.Entry> entries = defaultInput.getSchema().getEntries();
+            for (Schema.Entry entry : entries) {
+                String name = entry.getName();
+                Schema.Type type = entry.getType();
+                switch (type) {
+                    case DATETIME:
+                        record.withDateTime(name, defaultInput.getDateTime(name));
+                        break;
+                    case BOOLEAN:
+                        record.withBoolean(name, defaultInput.getBoolean(name));
+                        break;
+                    case DOUBLE:
+                        record.withDouble(name, defaultInput.getDouble(name));
+                        break;
+                    case INT:
+                        record.withInt(name, defaultInput.getInt(name));
+                        break;
+                    case LONG:
+                        record.withLong(name, defaultInput.getLong(name));
+                        break;
+                    case FLOAT:
+                        record.withFloat(name, defaultInput.getFloat(name));
+                        break;
+                    case STRING:
+                        record.withString(name, defaultInput.getString(name));
+                        break;
+                    case BYTES:
+                        record.withBytes(name, defaultInput.getBytes(name));
+                        break;
+                }
+            }
+            record.withString("SageMakerResponse", "");
+            outputEmitter.emit(record.build());
+
+            Record.Builder reject = builderFactory.newRecordBuilder();
+            reject.withString("SageMakerResponse", "");
+            rejectEmitter.emit(reject.build());
+            this.doGuessSchema = false;
+        }
+
     }
 
     @AfterGroup
